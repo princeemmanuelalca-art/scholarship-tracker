@@ -323,7 +323,7 @@
   </div>
 
   <script>
-    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzi3oF5BASgbdKfBwaXaw4wF4zUGSk1NSk2J8q-zJkBOkvpEkFFzvO39ruKtgRWQCBvuQ/exec";
+    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0n6QtsEooxPUFSebrgSr1Zhuj2sL1ix_MpfTBvEu2wwFlJyoOzmCMkuNBceDwCekonw/exec";
 
     let allData = [];
     let activeCategory = "All";
@@ -332,15 +332,16 @@
     function getTitle(item) {
       const possibleKeys = [
         'Scholarship/Program',
+        'Program',
         'Scholarship',
         'Scholarship Name',
-        'Program',
-        'Document',
         'Action Item',
+        'Document',
         'Office / Organization',
-        '#',
         'Country',
         'Contact/Portal',
+        '#',
+        'Priority',
         'Submission Method'
       ];
 
@@ -490,7 +491,7 @@
         <hr class="divider">
       `;
 
-      // Skip fields already shown in title or category
+      // Skip Category and the field used as title
       const skip = new Set(['Category']);
       const titleKey = Object.keys(s).find(k => s[k] === title);
       if (titleKey) skip.add(titleKey);
