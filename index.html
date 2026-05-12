@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scholarship Explorer</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-dark: #0d2419;
@@ -12,21 +12,16 @@
       --accent: #FFF4CC;
       --glass-bg: rgba(255, 244, 204, 0.05);
       --glass-border: rgba(255, 244, 204, 0.15);
-      --glass-hover: rgba(255, 244, 204, 0.12);
+      --glass-hover: rgba(255, 244, 204, 0.1);
       --font: 'DM Sans', sans-serif;
     }
 
-    /* Invisible Scrollbars */
     *::-webkit-scrollbar { display: none; }
-    * { 
-      margin: 0; padding: 0; box-sizing: border-box; 
-      -ms-overflow-style: none; scrollbar-width: none; 
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
 
     body {
       font-family: var(--font);
-      background: linear-gradient(160deg, var(--bg-dark), var(--bg-main));
+      background: linear-gradient(160deg, var(--bg-dark) 0%, var(--bg-main) 100%);
       color: var(--accent);
       min-height: 100vh;
       overflow-x: hidden;
@@ -41,120 +36,239 @@
     }
 
     header {
-      padding: 30px 20px;
+      padding: 36px 20px 16px;
       text-align: center;
-      margin-bottom: 10px;
     }
 
     h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .subtitle { font-size: 13px; opacity: 0.5; margin-top: 6px; }
 
+    /* ── NAV ── */
     .nav-tabs {
       display: flex;
       justify-content: center;
-      gap: 12px;
-      margin-bottom: 25px;
+      gap: 10px;
+      padding: 16px 20px 0;
     }
 
     .nav-tabs button {
       background: var(--glass-bg);
       color: var(--accent);
       border: 1px solid var(--glass-border);
-      padding: 12px 24px;
+      padding: 10px 22px;
       border-radius: 40px;
       cursor: pointer;
       font-family: var(--font);
       font-weight: 500;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 14px;
+      transition: all 0.25s ease;
     }
 
     .nav-tabs button.active {
       background: var(--accent);
       color: var(--bg-main);
-      box-shadow: 0 4px 15px rgba(255, 244, 204, 0.3);
+      border-color: var(--accent);
     }
 
+    /* ── CONTAINER ── */
     .container {
       max-width: 900px;
       margin: 0 auto;
-      padding: 0 20px 100px;
+      padding: 24px 20px 100px;
     }
 
-    /* Grid Layout */
+    /* ── SEARCH BAR ── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--accent);
+      padding: 14px 20px 14px 48px;
+      border-radius: 16px;
+      outline: none;
+      font-family: var(--font);
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input::placeholder { opacity: 0.4; }
+    .search-wrap input:focus { border-color: rgba(255, 244, 204, 0.45); }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--accent);
+      opacity: 0.4;
+      cursor: pointer;
+      font-size: 18px;
+      display: none;
+      padding: 4px;
+    }
+
+    /* ── FILTER CHIPS ── */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .chip {
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--accent);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .chip.active { background: var(--accent); color: var(--bg-main); border-color: var(--accent); }
+
+    /* ── RESULTS COUNT ── */
+    .results-meta {
+      font-size: 12px;
+      opacity: 0.45;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── GRID ── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 16px;
     }
 
     .card {
-      padding: 24px;
+      padding: 22px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .card:hover {
       background: var(--glass-hover);
-      transform: translateY(-4px);
-      border-color: var(--accent);
+      transform: translateY(-3px);
+      border-color: rgba(255, 244, 204, 0.35);
     }
 
+    .card:active { transform: translateY(0); }
+
     .card-badge {
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      background: rgba(255, 244, 204, 0.15);
-      padding: 4px 12px;
-      border-radius: 10px;
+      background: rgba(255, 244, 204, 0.12);
+      padding: 4px 10px;
+      border-radius: 8px;
       width: fit-content;
     }
 
-    .card-title { font-size: 18px; font-weight: 700; line-height: 1.3; }
-    .card-sub { font-size: 14px; opacity: 0.7; }
+    .card-title { font-size: 16px; font-weight: 700; line-height: 1.3; }
+    .card-sub { font-size: 13px; opacity: 0.55; line-height: 1.4; }
 
-    /* AI Chat UI */
-    #chatSection { display: none; flex-direction: column; height: 70vh; }
-    
+    .card-arrow {
+      margin-top: auto;
+      font-size: 18px;
+      opacity: 0.25;
+      text-align: right;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state .icon { font-size: 40px; margin-bottom: 14px; }
+    .empty-state p { font-size: 15px; }
+
+    /* ── LOADER ── */
+    .loader {
+      text-align: center;
+      padding: 60px 20px;
+      opacity: 0.5;
+      font-style: italic;
+    }
+
+    .loader-dots::after {
+      content: '';
+      animation: dots 1.2s infinite;
+    }
+    @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
+
+    /* ── CHAT ── */
+    #chatSection { display: none; flex-direction: column; }
+
     .chat-box {
-      flex: 1;
+      min-height: 300px;
+      max-height: 55vh;
       overflow-y: auto;
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 14px;
     }
 
     .msg {
-      max-width: 85%;
-      padding: 14px 18px;
+      max-width: 82%;
+      padding: 13px 17px;
       border-radius: 18px;
-      line-height: 1.5;
-      font-size: 15px;
-      animation: fadeIn 0.4s ease forwards;
+      line-height: 1.55;
+      font-size: 14px;
+      animation: fadeUp 0.3s ease forwards;
     }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     .msg.user {
       align-self: flex-end;
       background: var(--accent);
       color: var(--bg-main);
-      border-bottom-right-radius: 4px;
+      border-bottom-right-radius: 5px;
     }
 
     .msg.ai {
       align-self: flex-start;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0,0,0,0.2);
       border: 1px solid var(--glass-border);
-      border-bottom-left-radius: 4px;
+      border-bottom-left-radius: 5px;
+    }
+
+    .msg.ai.thinking {
+      opacity: 0.6;
+      font-style: italic;
     }
 
     .chat-input-area {
       display: flex;
-      gap: 12px;
-      padding: 20px;
+      gap: 10px;
+      padding: 16px 20px;
       border-top: 1px solid var(--glass-border);
     }
 
@@ -163,57 +277,129 @@
       background: rgba(0,0,0,0.2);
       border: 1px solid var(--glass-border);
       color: var(--accent);
-      padding: 14px 20px;
+      padding: 13px 18px;
       border-radius: 30px;
       outline: none;
       font-family: var(--font);
+      font-size: 14px;
+      transition: border-color 0.2s;
     }
 
-    .chat-input-area button {
+    .chat-input-area input::placeholder { opacity: 0.35; }
+    .chat-input-area input:focus { border-color: rgba(255,244,204,0.4); }
+
+    .send-btn {
       background: var(--accent);
       color: var(--bg-main);
       border: none;
-      padding: 0 25px;
+      padding: 0 22px;
       border-radius: 30px;
       cursor: pointer;
       font-weight: 700;
+      font-family: var(--font);
+      font-size: 14px;
+      transition: opacity 0.2s;
+      white-space: nowrap;
     }
 
-    /* Detail Modal */
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── MODAL ── */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       display: flex; align-items: center; justify-content: center;
       z-index: 1000;
-      opacity: 0; pointer-events: none; transition: 0.3s;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
     }
 
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
     .modal-content {
-      width: 90%; max-width: 550px; max-height: 85vh;
-      overflow-y: auto; padding: 40px; position: relative;
+      width: 90%; max-width: 540px; max-height: 88vh;
+      overflow-y: auto; padding: 36px; position: relative;
+      animation: scaleIn 0.25s ease forwards;
     }
+
+    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     .close-btn {
-      position: absolute; top: 20px; right: 20px;
-      background: none; border: none; color: var(--accent);
-      font-size: 28px; cursor: pointer;
+      position: absolute; top: 18px; right: 18px;
+      background: rgba(255,244,204,0.08);
+      border: 1px solid var(--glass-border);
+      color: var(--accent);
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
     }
 
-    .detail-row { margin-bottom: 20px; }
-    .detail-label { font-size: 11px; opacity: 0.5; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-    .detail-value { font-size: 17px; font-weight: 400; line-height: 1.4; }
+    .close-btn:hover { background: rgba(255,244,204,0.18); }
 
-    .loader { text-align: center; padding: 50px; font-style: italic; opacity: 0.6; }
+    .modal-category {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      opacity: 0.45;
+      margin-bottom: 10px;
+    }
 
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 28px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--glass-border);
+      margin: 20px 0;
+    }
+
+    .detail-row { margin-bottom: 18px; }
+    .detail-label {
+      font-size: 10px;
+      opacity: 0.4;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 5px;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .detail-value a {
+      color: var(--accent);
+      opacity: 0.7;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* ── ERROR BANNER ── */
+    .error-banner {
+      background: rgba(255, 100, 80, 0.1);
+      border: 1px solid rgba(255, 100, 80, 0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 16px;
+      display: none;
+    }
   </style>
 </head>
 <body>
 
   <header>
     <h1>Scholarship Explorer</h1>
+    <p class="subtitle">Philippine & International Scholarships</p>
   </header>
 
   <div class="nav-tabs">
@@ -222,64 +408,200 @@
   </div>
 
   <div class="container">
+
+    <!-- ── BROWSE ── -->
     <div id="browseSection">
-      <div id="loader" class="loader">Accessing Database...</div>
+      <div class="error-banner" id="errorBanner">Could not connect to database. Check your Apps Script URL.</div>
+
+      <div class="search-wrap">
+        <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search scholarships, providers, countries…" oninput="filterGrid()" />
+        <button class="clear-btn" id="clearBtn" onclick="clearSearch()">×</button>
+      </div>
+
+      <div class="filter-row" id="filterRow">
+        <button class="chip active" data-cat="All" onclick="setCategory('All', this)">All</button>
+      </div>
+
+      <div class="results-meta" id="resultsMeta"></div>
+      <div id="loader" class="loader"><span class="loader-dots">Accessing database</span></div>
       <div id="grid" class="grid"></div>
     </div>
 
+    <!-- ── CHAT ── -->
     <div id="chatSection" class="glass">
       <div class="chat-box" id="chatBox">
-        <div class="msg ai">Hello! I'm your AI assistant. I have access to your scholarship spreadsheet. How can I help you today?</div>
+        <div class="msg ai">Hi! I can answer questions about any scholarship in the database — deadlines, requirements, eligibility, and more. What would you like to know?</div>
       </div>
       <div class="chat-input-area">
-        <input type="text" id="chatInput" placeholder="Ask about deadlines or requirements..." onkeypress="if(event.key==='Enter')sendMessage()">
-        <button onclick="sendMessage()">Send</button>
+        <input type="text" id="chatInput" placeholder="Ask about any scholarship…" onkeypress="if(event.key==='Enter')sendMessage()" />
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
       </div>
     </div>
+
   </div>
 
+  <!-- ── MODAL ── -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="glass modal-content" onclick="event.stopPropagation()">
-      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <button class="close-btn" onclick="closeModal()">×</button>
       <div id="modalBody"></div>
     </div>
   </div>
 
   <script>
-    // --- SETTINGS: Update this with your deployed Apps Script URL ---
-    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQG4Eg9mD3JhcTExS_r1-58_HD9JTey90Ub-I48M3cUscqCpmjd2_HTupTmQCAdszKZg/exec"; 
-    
-    let scholarshipData = [];
+    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9b9VVEWHBbFEk5quxdr09kJvL4FPp988fs3uK1JhevbL_9r5dRSPAWxiVy8e7uEV4Gw/exec";
 
+    let allData = [];
+    let activeCategory = "All";
+
+    // ── LABELS: clean up raw spreadsheet column names ──
+    function formatLabel(key) {
+      return key
+        .replace(/_/g, ' ')
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    // ── DETECT URLs and linkify ──
+    function linkify(text) {
+      const urlPattern = /https?:\/\/[^\s]+/g;
+      return String(text).replace(urlPattern, url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+    }
+
+    // ── LOAD DATA ──
     async function loadData() {
       try {
-        const response = await fetch(`${APPSCRIPT_URL}?action=getScholarships`);
-        const data = await response.json();
-        scholarshipData = data;
+        const res = await fetch(`${APPSCRIPT_URL}?action=getScholarships`);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        allData = data;
+        document.getElementById('loader').style.display = 'none';
+        buildCategoryChips();
         renderGrid();
       } catch (e) {
-        document.getElementById('loader').innerText = "Error connecting to database.";
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('errorBanner').style.display = 'block';
       }
     }
 
-    function renderGrid() {
+    // ── BUILD CATEGORY CHIPS ──
+    function buildCategoryChips() {
+      const categories = [...new Set(allData.map(s => s.Category).filter(Boolean))];
+      const row = document.getElementById('filterRow');
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.dataset.cat = cat;
+        btn.textContent = cat;
+        btn.onclick = () => setCategory(cat, btn);
+        row.appendChild(btn);
+      });
+    }
+
+    function setCategory(cat, btn) {
+      activeCategory = cat;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      filterGrid();
+    }
+
+    // ── FILTER + RENDER ──
+    function filterGrid() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      document.getElementById('clearBtn').style.display = query ? 'flex' : 'none';
+
+      const filtered = allData.filter(s => {
+        const catMatch = activeCategory === 'All' || s.Category === activeCategory;
+        if (!catMatch) return false;
+        if (!query) return true;
+        return Object.values(s).some(v => String(v).toLowerCase().includes(query));
+      });
+
+      document.getElementById('resultsMeta').textContent =
+        allData.length > 0 ? `${filtered.length} of ${allData.length} scholarships` : '';
+
+      renderGrid(filtered);
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      filterGrid();
+    }
+
+    // ── RENDER GRID ──
+    function renderGrid(data) {
+      const source = data ?? allData;
       const grid = document.getElementById('grid');
-      document.getElementById('loader').style.display = 'none';
       grid.innerHTML = '';
-      
-      scholarshipData.forEach((item, index) => {
+
+      if (source.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1">
+            <div class="icon">🔍</div>
+            <p>No scholarships match your search.</p>
+          </div>`;
+        return;
+      }
+
+      source.forEach((item, index) => {
+        const realIndex = allData.indexOf(item);
         const card = document.createElement('div');
         card.className = 'glass card';
-        card.onclick = () => openModal(index);
+        card.onclick = () => openModal(realIndex);
+
+        const title = item.Program || item.Scholarship || item['Scholarship Name'] || 'Scholarship';
+        const sub = [item.Provider, item.University, item.Country]
+          .filter(v => v && v !== "null" && v !== "").slice(0, 2).join(' · ');
+
         card.innerHTML = `
           <div class="card-badge">${item.Category || 'Program'}</div>
-          <div class="card-title">${item.Program || item.Scholarship || 'Scholarship'}</div>
-          <div class="card-sub">${item.Provider || item.University || item.Country || ''}</div>
+          <div class="card-title">${title}</div>
+          ${sub ? `<div class="card-sub">${sub}</div>` : ''}
+          <div class="card-arrow">→</div>
         `;
         grid.appendChild(card);
       });
     }
 
+    // ── MODAL ──
+    function openModal(index) {
+      const s = allData[index];
+      const title = s.Program || s.Scholarship || s['Scholarship Name'] || 'Scholarship';
+
+      let html = `
+        <div class="modal-category">${s.Category || ''}</div>
+        <div class="modal-title">${title}</div>
+        <hr class="divider">
+      `;
+
+      const skip = new Set(['Category', 'Program', 'Scholarship', 'Scholarship Name']);
+
+      for (const [key, value] of Object.entries(s)) {
+        if (!value || value === "null" || value === "" || skip.has(key)) continue;
+        html += `
+          <div class="detail-row">
+            <div class="detail-label">${formatLabel(key)}</div>
+            <div class="detail-value">${linkify(value)}</div>
+          </div>
+        `;
+      }
+
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+      if (e && e.target !== document.getElementById('modalOverlay') && !e.target.classList.contains('close-btn')) return;
+      if (e && e.currentTarget === document.getElementById('modalOverlay') && e.target !== e.currentTarget) return;
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // ── TAB SWITCH ──
     function switchTab(type) {
       document.getElementById('browseSection').style.display = type === 'browse' ? 'block' : 'none';
       document.getElementById('chatSection').style.display = type === 'chat' ? 'flex' : 'none';
@@ -287,66 +609,52 @@
       document.getElementById('tabChat').classList.toggle('active', type === 'chat');
     }
 
-    function openModal(index) {
-      const s = scholarshipData[index];
-      const body = document.getElementById('modalBody');
-      let html = `<h2 style="margin-bottom:30px; color:var(--accent);">${s.Program || s.Scholarship}</h2>`;
-      
-      for (const [key, value] of Object.entries(s)) {
-        if (value && value !== "null" && key !== "Program" && key !== "Scholarship") {
-          html += `
-            <div class="detail-row">
-              <div class="detail-label">${key.replace(/_/g, ' ')}</div>
-              <div class="detail-value">${value}</div>
-            </div>
-          `;
-        }
-      }
-      body.innerHTML = html;
-      document.getElementById('modalOverlay').classList.add('active');
-    }
-
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('active');
-    }
+    // ── CHAT ──
+    let isSending = false;
 
     async function sendMessage() {
+      if (isSending) return;
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
       if (!text) return;
 
+      isSending = true;
+      document.getElementById('sendBtn').disabled = true;
+
       appendMessage('user', text);
       input.value = '';
 
-      // Send the top 15 results as context to the AI (to keep it fast)
-      const context = JSON.stringify(scholarshipData.slice(0, 15));
+      const thinking = appendMessage('ai', 'Thinking…', true);
 
       try {
         const res = await fetch(APPSCRIPT_URL, {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'askAI',
-            question: text,
-            context: context
-          })
+          body: JSON.stringify({ action: 'askAI', question: text })
         });
         const data = await res.json();
-        appendMessage('ai', data.answer);
+        thinking.remove();
+        appendMessage('ai', data.answer || data.error || "No response received.");
       } catch (e) {
-        appendMessage('ai', "Sorry, I'm having trouble connecting to the AI.");
+        thinking.remove();
+        appendMessage('ai', "Connection error. Please try again.");
+      } finally {
+        isSending = false;
+        document.getElementById('sendBtn').disabled = false;
+        input.focus();
       }
     }
 
-    function appendMessage(role, text) {
+    function appendMessage(role, text, isThinking = false) {
       const box = document.getElementById('chatBox');
       const div = document.createElement('div');
-      div.className = `msg ${role}`;
+      div.className = `msg ${role}${isThinking ? ' thinking' : ''}`;
       div.innerText = text;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
+      return div;
     }
 
-    // Initialize
+    // ── INIT ──
     loadData();
   </script>
 </body>
