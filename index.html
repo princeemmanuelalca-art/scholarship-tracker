@@ -43,33 +43,6 @@
     h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
     .subtitle { font-size: 13px; opacity: 0.5; margin-top: 6px; }
 
-    /* ── NAV ── */
-    .nav-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 16px 20px 0;
-    }
-
-    .nav-tabs button {
-      background: var(--glass-bg);
-      color: var(--accent);
-      border: 1px solid var(--glass-border);
-      padding: 10px 22px;
-      border-radius: 40px;
-      cursor: pointer;
-      font-family: var(--font);
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.25s ease;
-    }
-
-    .nav-tabs button.active {
-      background: var(--accent);
-      color: var(--bg-main);
-      border-color: var(--accent);
-    }
-
     /* ── CONTAINER ── */
     .container {
       max-width: 900px;
@@ -222,88 +195,6 @@
     }
     @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
 
-    /* ── CHAT ── */
-    #chatSection { display: none; flex-direction: column; }
-
-    .chat-box {
-      min-height: 300px;
-      max-height: 55vh;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .msg {
-      max-width: 82%;
-      padding: 13px 17px;
-      border-radius: 18px;
-      line-height: 1.55;
-      font-size: 14px;
-      animation: fadeUp 0.3s ease forwards;
-    }
-
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    .msg.user {
-      align-self: flex-end;
-      background: var(--accent);
-      color: var(--bg-main);
-      border-bottom-right-radius: 5px;
-    }
-
-    .msg.ai {
-      align-self: flex-start;
-      background: rgba(0,0,0,0.2);
-      border: 1px solid var(--glass-border);
-      border-bottom-left-radius: 5px;
-    }
-
-    .msg.ai.thinking {
-      opacity: 0.6;
-      font-style: italic;
-    }
-
-    .chat-input-area {
-      display: flex;
-      gap: 10px;
-      padding: 16px 20px;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .chat-input-area input {
-      flex: 1;
-      background: rgba(0,0,0,0.2);
-      border: 1px solid var(--glass-border);
-      color: var(--accent);
-      padding: 13px 18px;
-      border-radius: 30px;
-      outline: none;
-      font-family: var(--font);
-      font-size: 14px;
-      transition: border-color 0.2s;
-    }
-
-    .chat-input-area input::placeholder { opacity: 0.35; }
-    .chat-input-area input:focus { border-color: rgba(255,244,204,0.4); }
-
-    .send-btn {
-      background: var(--accent);
-      color: var(--bg-main);
-      border: none;
-      padding: 0 22px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: var(--font);
-      font-size: 14px;
-      transition: opacity 0.2s;
-      white-space: nowrap;
-    }
-
-    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
     /* ── MODAL ── */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -403,45 +294,24 @@
     <p class="subtitle">Philippine & International Scholarships</p>
   </header>
 
-  <div class="nav-tabs">
-    <button id="tabBrowse" class="active" onclick="switchTab('browse')">Browse</button>
-    <button id="tabChat" onclick="switchTab('chat')">AI Assistant</button>
-  </div>
-
   <div class="container">
+    <div class="error-banner" id="errorBanner">Could not connect to database. Check your Apps Script URL.</div>
 
-    <!-- ── BROWSE ── -->
-    <div id="browseSection">
-      <div class="error-banner" id="errorBanner">Could not connect to database. Check your Apps Script URL.</div>
-
-      <div class="search-wrap">
-        <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input type="text" id="searchInput" placeholder="Search scholarships, providers, countries…" oninput="filterGrid()" />
-        <button class="clear-btn" id="clearBtn" onclick="clearSearch()">×</button>
-      </div>
-
-      <div class="filter-row" id="filterRow">
-        <button class="chip active" data-cat="All" onclick="setCategory('All', this)">All</button>
-      </div>
-
-      <div class="results-meta" id="resultsMeta"></div>
-      <div id="loader" class="loader"><span class="loader-dots">Accessing database</span></div>
-      <div id="grid" class="grid"></div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Search scholarships, providers, countries…" oninput="filterGrid()" />
+      <button class="clear-btn" id="clearBtn" onclick="clearSearch()">×</button>
     </div>
 
-    <!-- ── CHAT ── -->
-    <div id="chatSection" class="glass">
-      <div class="chat-box" id="chatBox">
-        <div class="msg ai">Hi! I can answer questions about any scholarship in the database — deadlines, requirements, eligibility, and more. What would you like to know?</div>
-      </div>
-      <div class="chat-input-area">
-        <input type="text" id="chatInput" placeholder="Ask about any scholarship…" onkeypress="if(event.key==='Enter')sendMessage()" />
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
-      </div>
+    <div class="filter-row" id="filterRow">
+      <button class="chip active" data-cat="All" onclick="setCategory('All', this)">All</button>
     </div>
 
+    <div class="results-meta" id="resultsMeta"></div>
+    <div id="loader" class="loader"><span class="loader-dots">Accessing database</span></div>
+    <div id="grid" class="grid"></div>
   </div>
 
   <!-- ── MODAL ── -->
@@ -453,12 +323,11 @@
   </div>
 
   <script>
-    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbxG6E1n1rl5YzXVMoCzwMrfx8eqQQrgN9wPLUZ133IhKUklrhoHS10ZRqWMmwch9H7u/exec";
+    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvXuAJq9K7mu41QWIQIGmIgRlE4eizL37oPtazv2n3yq81Ww5GNOCg-4ki1gWTXt2SuQ/exec";
 
     let allData = [];
     let activeCategory = "All";
 
-    // ── LABELS: clean up raw spreadsheet column names ──
     function formatLabel(key) {
       return key
         .replace(/_/g, ' ')
@@ -466,13 +335,11 @@
         .replace(/\b\w/g, c => c.toUpperCase());
     }
 
-    // ── DETECT URLs and linkify ──
     function linkify(text) {
       const urlPattern = /https?:\/\/[^\s<>"{}|\^`\[\]]+/g;
       return String(text).replace(urlPattern, url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
     }
 
-    // ── LOAD DATA ──
     async function loadData() {
       try {
         const res = await fetch(`${APPSCRIPT_URL}?action=getScholarships`);
@@ -488,7 +355,6 @@
       }
     }
 
-    // ── BUILD CATEGORY CHIPS ──
     function buildCategoryChips() {
       const categories = [...new Set(allData.map(s => s.Category).filter(Boolean))];
       const row = document.getElementById('filterRow');
@@ -509,7 +375,6 @@
       filterGrid();
     }
 
-    // ── FILTER + RENDER ──
     function filterGrid() {
       const query = document.getElementById('searchInput').value.toLowerCase().trim();
       document.getElementById('clearBtn').style.display = query ? 'flex' : 'none';
@@ -532,7 +397,6 @@
       filterGrid();
     }
 
-    // ── RENDER GRID ──
     function renderGrid(data) {
       const source = data ?? allData;
       const grid = document.getElementById('grid');
@@ -550,7 +414,6 @@
       source.forEach(item => {
         const card = document.createElement('div');
         card.className = 'glass card';
-        // Pass the item object directly instead of relying on indexOf
         card.onclick = () => openModal(item);
 
         const title = item['Scholarship/Program'] || item.Program || item.Scholarship || item['Scholarship Name'] || 'Unnamed';
@@ -567,7 +430,6 @@
       });
     }
 
-    // ── MODAL ──
     function openModal(s) {
       const title = s.Program || s.Scholarship || s['Scholarship Name'] || 'Scholarship';
 
@@ -595,74 +457,17 @@
     }
 
     function closeModal(e) {
-      // Called without event (close button) → always close
       if (!e) {
         document.getElementById('modalOverlay').classList.remove('active');
         document.body.style.overflow = '';
         return;
       }
-      // Called with event (overlay click) → only close if clicking overlay background itself
       if (e.target === document.getElementById('modalOverlay')) {
         document.getElementById('modalOverlay').classList.remove('active');
         document.body.style.overflow = '';
       }
     }
 
-    // ── TAB SWITCH ──
-    function switchTab(type) {
-      document.getElementById('browseSection').style.display = type === 'browse' ? 'block' : 'none';
-      document.getElementById('chatSection').style.display = type === 'chat' ? 'flex' : 'none';
-      document.getElementById('tabBrowse').classList.toggle('active', type === 'browse');
-      document.getElementById('tabChat').classList.toggle('active', type === 'chat');
-    }
-
-    // ── CHAT ──
-    let isSending = false;
-
-    async function sendMessage() {
-      if (isSending) return;
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      isSending = true;
-      document.getElementById('sendBtn').disabled = true;
-
-      appendMessage('user', text);
-      input.value = '';
-
-      const thinking = appendMessage('ai', 'Thinking…', true);
-
-      try {
-        const res = await fetch(APPSCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'askAI', question: text })
-        });
-        const data = await res.json();
-        thinking.remove();
-        appendMessage('ai', data.answer || data.error || "No response received.");
-      } catch (e) {
-        thinking.remove();
-        appendMessage('ai', "Connection error. Please try again.");
-      } finally {
-        isSending = false;
-        document.getElementById('sendBtn').disabled = false;
-        input.focus();
-      }
-    }
-
-    function appendMessage(role, text, isThinking = false) {
-      const box = document.getElementById('chatBox');
-      const div = document.createElement('div');
-      div.className = `msg ${role}${isThinking ? ' thinking' : ''}`;
-      div.innerText = text;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
-      return div;
-    }
-
-    // ── INIT ──
     loadData();
   </script>
 </body>
