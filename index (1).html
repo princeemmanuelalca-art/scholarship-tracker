@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Scholarship Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0a0a0b;
+--surface:#111113;
+--surface2:#18181b;
+--border:#222226;
+--text:#f0f0f0;
+--muted:#666;
+--faint:#333;
+--green:#22c55e;
+--red:#ef4444;
+--blue:#3b82f6;
+--yellow:#f59e0b;
+--purple:#a855f7;
+--mono:'Space Mono',monospace;
+--sans:'DM Sans',sans-serif;
+}
+html,body{height:100%;overflow-x:hidden;background:var(--bg)}
+body{color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5}
+#app{max-width:430px;margin:0 auto;padding:16px;min-height:100vh}
+
+/* SETUP */
+.setup-wrap{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding-bottom:40px}
+.logo{font-family:var(--mono);font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.setup-title{font-size:28px;font-weight:700;line-height:1.2;margin-bottom:6px}
+.setup-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
+.field-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:var(--mono)}
+.field-hint{font-size:12px;color:var(--muted);margin-top:6px}
+.field-hint a{color:var(--blue);text-decoration:none}
+
+/* INPUTS */
+input[type="text"],input[type="password"]{
+width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+padding:13px 14px;color:var(--text);font-size:15px;font-family:var(--sans);outline:none;
+-webkit-appearance:none;transition:border-color .15s
+}
+input:focus{border-color:#444}
+input::placeholder{color:var(--muted)}
+select{
+width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+padding:13px 14px;color:var(--text);font-size:15px;font-family:var(--sans);outline:none;
+-webkit-appearance:none;transition:border-color .15s;cursor:pointer
+}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:10px;padding:13px 18px;font-size:15px;font-weight:600;font-family:var(--sans);cursor:pointer;transition:opacity .1s,transform .1s;white-space:nowrap}
+.btn:active{opacity:.8;transform:scale(.98)}
+.btn-primary{background:var(--text);color:var(--bg)}
+.btn-ghost{background:var(--surface2);color:var(--text)}
+.btn-danger{background:#1f0707;color:var(--red);border:1px solid #3d0e0e}
+.btn-sm{padding:9px 13px;font-size:13px;border-radius:8px}
+.btn-full{width:100%}
+.btn-del{background:#1f0707;color:var(--red);padding:7px 11px;font-size:12px;border-radius:7px;border:none;cursor:pointer;font-family:var(--sans);font-weight:600;flex-shrink:0}
+.btn-del:active{opacity:.7}
+.btn-done{background:#071f0e;color:var(--green);padding:7px 11px;font-size:12px;border-radius:7px;border:none;cursor:pointer;font-family:var(--sans);font-weight:600;flex-shrink:0}
+.btn-done:active{opacity:.7}
+
+/* HEADER */
+.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-top:4px}
+.main-logo{font-family:var(--mono);font-size:13px;letter-spacing:2px;color:var(--muted)}
+.header-actions{display:flex;gap:8px}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center}
+.dash-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:var(--mono);margin-bottom:5px}
+.dash-val{font-size:17px;font-weight:700;font-family:var(--mono);letter-spacing:-0.5px}
+.c-green{color:var(--green)}
+.c-red{color:var(--red)}
+.c-blue{color:var(--blue)}
+.c-yellow{color:var(--yellow)}
+.c-purple{color:var(--purple)}
+
+/* SYNC */
+.sync-bar{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;font-family:var(--mono);letter-spacing:.5px;height:16px}
+.sync-bar.ok{color:var(--green)}
+.sync-bar.err{color:var(--red)}
+
+/* TABS */
+.tab-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.tab{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 6px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;text-align:center;font-family:var(--sans);transition:all .15s}
+.tab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+/* CARDS */
+.add-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.add-hint{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.add-row{display:flex;gap:8px}
+.add-row input{flex:1}
+.field-group{margin-bottom:10px}
+
+/* ITEMS */
+.item-row{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px}
+.item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.item-body{flex:1;min-width:0}
+.item-title{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:2px}
+.item-sub{font-size:12px;color:var(--muted);line-height:1.4}
+.item-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.status-pill{font-size:10px;font-family:var(--mono);letter-spacing:1px;padding:4px 8px;border-radius:6px;font-weight:700;text-transform:uppercase;white-space:nowrap}
+
+/* STATUS COLORS */
+.s-notstarted{background:#1a1a1a;color:var(--muted)}
+.s-inprogress{background:#1c2a3a;color:var(--blue)}
+.s-done{background:#071f0e;color:var(--green)}
+.s-blocked{background:#1f0707;color:var(--red)}
+.s-submitted{background:#1f1a07;color:var(--yellow)}
+
+/* SCHOLARSHIP ROWS */
+.sch-row{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px;margin-bottom:8px}
+.sch-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.sch-name{font-size:14px;font-weight:700;line-height:1.3;flex:1;margin-right:8px}
+.sch-country{font-size:11px;font-family:var(--mono);color:var(--muted);white-space:nowrap}
+.sch-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.sch-tag{font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 7px;color:var(--muted);font-family:var(--mono)}
+.sch-deadline{font-size:11px;color:var(--yellow);font-family:var(--mono)}
+
+/* DATE SEP */
+.date-sep{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--faint);font-family:var(--mono);margin:14px 0 6px;padding-left:2px}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+.empty-icon{font-size:32px;margin-bottom:8px;opacity:.3}
+
+/* SUMMARY */
+.sum-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px}
+.sum-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-family:var(--mono);margin-bottom:12px}
+.cat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.cat-row:last-child{border-bottom:none}
+.cat-name{font-size:13px;color:var(--text)}
+.cat-val{font-size:13px;font-weight:700;font-family:var(--mono)}
+.prog-bar{height:3px;border-radius:2px;background:var(--border);margin-top:8px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .4s ease}
+
+/* AI */
+.ai-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.ai-hint{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.ai-answer{background:var(--surface2);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;padding:13px 14px;font-size:14px;line-height:1.7;white-space:pre-wrap;margin-top:10px;color:var(--text)}
+.ai-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.ai-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--sans);transition:all .15s}
+.ai-chip:hover{border-color:#444;color:var(--text)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;backdrop-filter:blur(4px)}
+.modal-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;max-width:380px;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.modal-field{margin-bottom:12px}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+
+.feedback-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;margin-top:10px}
+.loading-text{font-size:13px;color:var(--muted);font-family:var(--mono);padding:10px 0;letter-spacing:1px}
+
+.hidden{display:none!important}
+.mt8{margin-top:8px}
+.mt12{margin-top:12px}
+.mt4{margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SETUP SCREEN -->
+<div id="setupScreen">
+  <div class="setup-wrap">
+    <div class="logo">Scholarship Tracker</div>
+    <div class="setup-title">Track every application.<br>Win fully funded.</div>
+    <div class="setup-sub">Powered by Groq AI + Google Sheets.<br>Built for Filipino scholars.</div>
+    <div class="setup-card">
+      <div class="field-label">Groq API Key</div>
+      <input type="password" id="apiKeyInput" placeholder="gsk_..." onkeydown="if(event.key==='Enter')saveApiKey()">
+      <div class="field-hint">Get a free key at <a href="https://groq.com" target="_blank">groq.com</a></div>
+      <button class="btn btn-primary btn-full mt12" onclick="saveApiKey()">Get Started</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div id="mainScreen" class="hidden">
+  <div class="main-header">
+    <div class="main-logo">SCHTRK</div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="loadFromSheet()">↻ Sync</button>
+      <button class="btn btn-ghost btn-sm" onclick="showSettings()">⚙</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dash-grid">
+    <div class="dash-card">
+      <div class="dash-label">Total</div>
+      <div class="dash-val c-blue" id="dashTotal">0</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-label">Done</div>
+      <div class="dash-val c-green" id="dashDone">0</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-label">Pending</div>
+      <div class="dash-val c-yellow" id="dashPending">0</div>
+    </div>
+  </div>
+
+  <div id="syncStatus" class="sync-bar">—</div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('Actions')" id="tabActions">Actions</div>
+    <div class="tab" onclick="switchTab('Scholarships')" id="tabScholarships">Programs</div>
+    <div class="tab" onclick="switchTab('Summary')" id="tabSummary">Summary</div>
+    <div class="tab" onclick="switchTab('Ai')" id="tabAi">Ask AI</div>
+  </div>
+
+  <!-- ACTIONS TAB -->
+  <div id="viewActions">
+    <div class="add-card">
+      <div class="add-hint">Add a new action item to your preparation plan.</div>
+      <div class="field-group">
+        <input type="text" id="actionInput" placeholder="e.g. Submit MEXT application forms" onkeydown="if(event.key==='Enter')addAction()">
+      </div>
+      <div style="display:flex;gap:8px">
+        <select id="actionCat" style="flex:1">
+          <option value="Academic">Academic</option>
+          <option value="Documentation">Documentation</option>
+          <option value="Personal Statement">Personal Statement</option>
+          <option value="Research">Research</option>
+          <option value="Language">Language</option>
+          <option value="Application">Application</option>
+          <option value="Interview">Interview</option>
+          <option value="Other">Other</option>
+        </select>
+        <button class="btn btn-primary" onclick="addAction()">Add</button>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="ai-chips" id="actionFilters">
+      <div class="ai-chip active-chip" onclick="filterActions('All')" id="fAll">All</div>
+      <div class="ai-chip" onclick="filterActions('Not Started')" id="fNotStarted">Not Started</div>
+      <div class="ai-chip" onclick="filterActions('In Progress')" id="fInProgress">In Progress</div>
+      <div class="ai-chip" onclick="filterActions('Done')" id="fDone">Done</div>
+      <div class="ai-chip" onclick="filterActions('Submitted')" id="fSubmitted">Submitted</div>
+    </div>
+
+    <div id="actionList"></div>
+  </div>
+
+  <!-- SCHOLARSHIPS TAB -->
+  <div id="viewScholarships" class="hidden">
+    <div class="add-card">
+      <div class="add-hint">Log a scholarship program you're tracking.</div>
+      <div class="field-group">
+        <input type="text" id="schNameInput" placeholder="e.g. MEXT Undergraduate Scholarship">
+      </div>
+      <div class="field-group">
+        <input type="text" id="schCountryInput" placeholder="Country (e.g. 🇯🇵 Japan)">
+      </div>
+      <div class="field-group">
+        <input type="text" id="schDeadlineInput" placeholder="Deadline (e.g. April–May 2027)">
+      </div>
+      <div style="display:flex;gap:8px">
+        <select id="schStatusInput" style="flex:1">
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Submitted">Submitted</option>
+          <option value="Done">Done</option>
+          <option value="Blocked">Blocked</option>
+        </select>
+        <button class="btn btn-primary" onclick="addScholarship()">Add</button>
+      </div>
+    </div>
+    <div id="scholarshipList"></div>
+  </div>
+
+  <!-- SUMMARY TAB -->
+  <div id="viewSummary" class="hidden">
+    <div class="sum-card">
+      <div class="sum-title">Action Plan Progress</div>
+      <div id="actionProgress"></div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-title">Programs by Status</div>
+      <div id="schProgress"></div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-title">Actions by Category</div>
+      <div id="catProgress"></div>
+    </div>
+  </div>
+
+  <!-- AI TAB -->
+  <div id="viewAi" class="hidden">
+    <div class="ai-card">
+      <div class="ai-hint">Ask anything about your scholarship applications.</div>
+      <div class="ai-chips">
+        <div class="ai-chip" onclick="setAiPrompt('Summarize my progress')">Summarize progress</div>
+        <div class="ai-chip" onclick="setAiPrompt('Which scholarships have the closest deadlines?')">Closest deadlines</div>
+        <div class="ai-chip" onclick="setAiPrompt('What should I focus on right now?')">What to focus on</div>
+        <div class="ai-chip" onclick="setAiPrompt('Review my personal statement strengths')">PS strengths</div>
+        <div class="ai-chip" onclick="setAiPrompt('Am I on track for MEXT?')">MEXT status</div>
+      </div>
+      <div class="add-row">
+        <input type="text" id="aiInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')askAI()">
+        <button class="btn btn-primary" onclick="askAI()">Ask</button>
+      </div>
+      <div id="aiAnswer"></div>
+    </div>
+  </div>
+
+</div><!-- end mainScreen -->
+
+<!-- STATUS CHANGE MODAL -->
+<div id="statusModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-title">Update Status</div>
+    <div class="modal-field">
+      <div class="field-label">Action Item</div>
+      <div id="modalItemTitle" style="font-size:14px;color:var(--muted);line-height:1.4;margin-bottom:12px"></div>
+      <div class="field-label">New Status</div>
+      <select id="modalStatus">
+        <option value="Not Started">Not Started</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+        <option value="Blocked">Blocked</option>
+        <option value="Submitted">Submitted</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="saveStatus()">Save</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeStatusModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-title">Settings</div>
+    <div class="modal-field">
+      <div class="field-label">Groq API Key</div>
+      <input type="password" id="settingsKey" placeholder="gsk_...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="saveSettings()">Save</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeSettings()">Close</button>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-danger btn-full" onclick="clearLocalCache()">Clear Local Cache</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const GROQ_URL   = "https://api.groq.com/openai/v1/chat/completions";
+const MODEL      = "llama-3.3-70b-versatile";
+const SHEET_URL  = "https://script.google.com/macros/s/AKfycby5DaxIBzJIbQ2rFKrPbReD23qJDzCWrbfLgOkcjZSIz-0ZA7NjYV7hHB9BQGU7iAle_Q/exec";
+const SHEET_TOKEN = "schtrk_secret_2026";
+
+const STATUS_COLORS = {
+  "Not Started" : "s-notstarted",
+  "In Progress" : "s-inprogress",
+  "Done"        : "s-done",
+  "Blocked"     : "s-blocked",
+  "Submitted"   : "s-submitted"
+};
+
+const CAT_COLORS = {
+  "Academic"         : "#3b82f6",
+  "Documentation"    : "#a855f7",
+  "Personal Statement": "#ec4899",
+  "Research"         : "#f59e0b",
+  "Language"         : "#22c55e",
+  "Application"      : "#06b6d4",
+  "Interview"        : "#ef4444",
+  "Other"            : "#6b7280"
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+var actions      = [];  // action plan items
+var scholarships = [];  // scholarship programs
+var activeFilter = "All";
+var pendingStatusId = null;
+var pendingStatusType = null; // "action" | "scholarship"
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function getKey()  { return localStorage.getItem("groq_key") || ""; }
+function esc(s)    { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function uid()     { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ─── SYNC STATUS ─────────────────────────────────────────────────────────────
+function setSyncStatus(msg, type) {
+  var el = document.getElementById("syncStatus");
+  el.textContent = msg;
+  el.className = "sync-bar" + (type ? " " + type : "");
+}
+
+// ─── SHEET OPS ────────────────────────────────────────────────────────────────
+async function loadFromSheet() {
+  setSyncStatus("Syncing with Google Sheets...");
+  try {
+    var res = await fetch(SHEET_URL + "?token=" + SHEET_TOKEN);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    var data = await res.json();
+
+    // Expecting {actions: [...], scholarships: [...]} from Apps Script
+    if (data.actions)      actions      = data.actions;
+    if (data.scholarships) scholarships = data.scholarships;
+
+    setSyncStatus("Synced · " + (actions.length + scholarships.length) + " items", "ok");
+    renderAll();
+  } catch(e) {
+    setSyncStatus("Sync failed: " + e.message, "err");
+  }
+}
+
+async function saveToSheet(action, payload) {
+  var body = Object.assign({ action: action, token: SHEET_TOKEN }, payload);
+  var res = await fetch(SHEET_URL, {
+    method: "POST",
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error("Sheet error " + res.status);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  if (getKey()) { showMain(); loadFromSheet(); }
+  else { showSetup(); }
+}
+function showSetup() {
+  document.getElementById("setupScreen").classList.remove("hidden");
+  document.getElementById("mainScreen").classList.add("hidden");
+}
+function showMain() {
+  document.getElementById("setupScreen").classList.add("hidden");
+  document.getElementById("mainScreen").classList.remove("hidden");
+}
+function saveApiKey() {
+  var k = document.getElementById("apiKeyInput").value.trim();
+  if (!k) { alert("Please enter your Groq API key."); return; }
+  localStorage.setItem("groq_key", k);
+  showMain();
+  loadFromSheet();
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  ["Actions","Scholarships","Summary","Ai"].forEach(function(t) {
+    document.getElementById("view"+t).classList.add("hidden");
+    document.getElementById("tab"+t).classList.remove("active");
+  });
+  document.getElementById("view"+name).classList.remove("hidden");
+  document.getElementById("tab"+name).classList.add("active");
+  renderAll();
+}
+
+// ─── RENDER ALL ───────────────────────────────────────────────────────────────
+function renderAll() {
+  renderDashboard();
+  renderActions();
+  renderScholarships();
+  renderSummary();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  var total   = actions.length + scholarships.length;
+  var done    = actions.filter(function(a){ return a.status==="Done"||a.status==="Submitted"; }).length +
+                scholarships.filter(function(s){ return s.status==="Done"||s.status==="Submitted"; }).length;
+  var pending = total - done;
+
+  document.getElementById("dashTotal").textContent   = total;
+  document.getElementById("dashDone").textContent    = done;
+  document.getElementById("dashPending").textContent = pending;
+}
+
+// ─── ADD ACTION ───────────────────────────────────────────────────────────────
+async function addAction() {
+  var text = document.getElementById("actionInput").value.trim();
+  var cat  = document.getElementById("actionCat").value;
+  if (!text) return;
+
+  var item = {
+    id       : uid(),
+    type     : "action",
+    title    : text,
+    category : cat,
+    status   : "Not Started",
+    date     : new Date().toISOString().slice(0,10)
+  };
+
+  setSyncStatus("Saving...");
+  try {
+    await saveToSheet("add_action", item);
+    actions.unshift(item);
+    document.getElementById("actionInput").value = "";
+    renderAll();
+    setSyncStatus("Saved ✓", "ok");
+  } catch(e) {
+    setSyncStatus("Save failed: " + e.message, "err");
+  }
+}
+
+// ─── ADD SCHOLARSHIP ──────────────────────────────────────────────────────────
+async function addScholarship() {
+  var name     = document.getElementById("schNameInput").value.trim();
+  var country  = document.getElementById("schCountryInput").value.trim();
+  var deadline = document.getElementById("schDeadlineInput").value.trim();
+  var status   = document.getElementById("schStatusInput").value;
+  if (!name) return;
+
+  var item = {
+    id       : uid(),
+    type     : "scholarship",
+    name     : name,
+    country  : country || "—",
+    deadline : deadline || "TBD",
+    status   : status,
+    date     : new Date().toISOString().slice(0,10)
+  };
+
+  setSyncStatus("Saving...");
+  try {
+    await saveToSheet("add_scholarship", item);
+    scholarships.unshift(item);
+    document.getElementById("schNameInput").value     = "";
+    document.getElementById("schCountryInput").value  = "";
+    document.getElementById("schDeadlineInput").value = "";
+    renderAll();
+    setSyncStatus("Saved ✓", "ok");
+  } catch(e) {
+    setSyncStatus("Save failed: " + e.message, "err");
+  }
+}
+
+// ─── FILTER ACTIONS ───────────────────────────────────────────────────────────
+function filterActions(f) {
+  activeFilter = f;
+  ["All","NotStarted","InProgress","Done","Submitted"].forEach(function(k) {
+    document.getElementById("f"+k.replace(" ","")).classList.remove("active-chip");
+  });
+  var idMap = {"All":"fAll","Not Started":"fNotStarted","In Progress":"fInProgress","Done":"fDone","Submitted":"fSubmitted"};
+  if (idMap[f]) document.getElementById(idMap[f]).classList.add("active-chip");
+  renderActions();
+}
+
+// ─── RENDER ACTIONS ───────────────────────────────────────────────────────────
+function renderActions() {
+  var el = document.getElementById("actionList");
+  var filtered = activeFilter === "All"
+    ? actions
+    : actions.filter(function(a){ return a.status === activeFilter; });
+
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>No action items yet.<br>Add one above!</div>';
+    return;
+  }
+
+  var html = filtered.map(function(a) {
+    var color    = CAT_COLORS[a.category] || "#6b7280";
+    var pillCls  = STATUS_COLORS[a.status] || "s-notstarted";
+    return (
+      '<div class="item-row">' +
+      '<div class="item-dot" style="background:'+color+'"></div>' +
+      '<div class="item-body">' +
+        '<div class="item-title">'+esc(a.title)+'</div>' +
+        '<div class="item-sub">'+esc(a.category)+' · '+esc(a.date)+'</div>' +
+      '</div>' +
+      '<div class="item-right">' +
+        '<div class="status-pill '+pillCls+' btn-done" style="cursor:pointer" onclick="openStatusModal(\''+a.id+'\',\'action\')">'+esc(a.status)+'</div>' +
+        '<button class="btn-del" onclick="deleteItem(\''+a.id+'\',\'action\')">Del</button>' +
+      '</div>' +
+      '</div>'
+    );
+  }).join("");
+
+  el.innerHTML = html;
+}
+
+// ─── RENDER SCHOLARSHIPS ──────────────────────────────────────────────────────
+function renderScholarships() {
+  var el = document.getElementById("scholarshipList");
+  if (!scholarships.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎓</div>No programs tracked yet.<br>Add one above!</div>';
+    return;
+  }
+
+  var html = scholarships.map(function(s) {
+    var pillCls = STATUS_COLORS[s.status] || "s-notstarted";
+    return (
+      '<div class="sch-row">' +
+        '<div class="sch-top">' +
+          '<div class="sch-name">'+esc(s.name)+'</div>' +
+          '<div class="sch-country">'+esc(s.country)+'</div>' +
+        '</div>' +
+        '<div class="sch-meta">' +
+          '<div class="sch-tag">📅 '+esc(s.deadline)+'</div>' +
+          '<div class="status-pill '+pillCls+'" style="cursor:pointer" onclick="openStatusModal(\''+s.id+'\',\'scholarship\')">'+esc(s.status)+'</div>' +
+          '<button class="btn-del" onclick="deleteItem(\''+s.id+'\',\'scholarship\')">Del</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join("");
+
+  el.innerHTML = html;
+}
+
+// ─── RENDER SUMMARY ───────────────────────────────────────────────────────────
+function renderSummary() {
+  // Action plan overall progress
+  var total  = actions.length;
+  var done   = actions.filter(function(a){ return a.status==="Done"||a.status==="Submitted"; }).length;
+  var pct    = total > 0 ? Math.round((done/total)*100) : 0;
+  var progEl = document.getElementById("actionProgress");
+  progEl.innerHTML =
+    '<div class="cat-row"><div class="cat-name">Completed</div><div class="cat-val c-green">'+done+' / '+total+'</div></div>' +
+    '<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:var(--green)"></div></div>' +
+    '<div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:6px">'+pct+'% done</div>';
+
+  // Scholarships by status
+  var schByStatus = {};
+  scholarships.forEach(function(s) {
+    schByStatus[s.status] = (schByStatus[s.status]||0) + 1;
+  });
+  var schEl = document.getElementById("schProgress");
+  if (!Object.keys(schByStatus).length) {
+    schEl.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px 0">No programs tracked yet</div>';
+  } else {
+    schEl.innerHTML = Object.entries(schByStatus).map(function(e) {
+      var pillCls = STATUS_COLORS[e[0]] || "s-notstarted";
+      return '<div class="cat-row"><div class="cat-name"><span class="status-pill '+pillCls+'">'+esc(e[0])+'</span></div><div class="cat-val">'+e[1]+'</div></div>';
+    }).join("");
+  }
+
+  // Actions by category
+  var byCat = {};
+  actions.forEach(function(a) {
+    byCat[a.category] = (byCat[a.category]||0) + 1;
+  });
+  var catEl = document.getElementById("catProgress");
+  if (!Object.keys(byCat).length) {
+    catEl.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px 0">No action items yet</div>';
+  } else {
+    var max = Math.max.apply(null, Object.values(byCat));
+    catEl.innerHTML = Object.entries(byCat).sort(function(a,b){ return b[1]-a[1]; }).map(function(e) {
+      var color = CAT_COLORS[e[0]] || "#6b7280";
+      var pctBar = max > 0 ? Math.round((e[1]/max)*100) : 0;
+      return (
+        '<div class="cat-row"><div class="cat-name">'+esc(e[0])+'</div><div class="cat-val">'+e[1]+'</div></div>' +
+        '<div class="prog-bar"><div class="prog-fill" style="width:'+pctBar+'%;background:'+color+'"></div></div>'
+      );
+    }).join("");
+  }
+}
+
+// ─── STATUS MODAL ─────────────────────────────────────────────────────────────
+function openStatusModal(id, type) {
+  pendingStatusId   = id;
+  pendingStatusType = type;
+  var item = type === "action"
+    ? actions.find(function(a){ return a.id===id; })
+    : scholarships.find(function(s){ return s.id===id; });
+  if (!item) return;
+
+  document.getElementById("modalItemTitle").textContent = item.title || item.name;
+  document.getElementById("modalStatus").value = item.status;
+  document.getElementById("statusModal").classList.remove("hidden");
+}
+
+function closeStatusModal() {
+  document.getElementById("statusModal").classList.add("hidden");
+  pendingStatusId = null;
+  pendingStatusType = null;
+}
+
+async function saveStatus() {
+  var newStatus = document.getElementById("modalStatus").value;
+  var id        = pendingStatusId;
+  var type      = pendingStatusType;
+  closeStatusModal();
+
+  setSyncStatus("Updating...");
+  try {
+    await saveToSheet("update_status", { id: id, itemType: type, status: newStatus });
+    if (type === "action") {
+      var a = actions.find(function(x){ return x.id===id; });
+      if (a) a.status = newStatus;
+    } else {
+      var s = scholarships.find(function(x){ return x.id===id; });
+      if (s) s.status = newStatus;
+    }
+    renderAll();
+    setSyncStatus("Updated ✓", "ok");
+  } catch(e) {
+    setSyncStatus("Update failed: " + e.message, "err");
+  }
+}
+
+// ─── DELETE ───────────────────────────────────────────────────────────────────
+async function deleteItem(id, type) {
+  if (!confirm("Delete this item?")) return;
+  setSyncStatus("Deleting...");
+  try {
+    await saveToSheet("delete", { id: id, itemType: type });
+    if (type === "action")      actions      = actions.filter(function(a){ return a.id!==id; });
+    else                        scholarships = scholarships.filter(function(s){ return s.id!==id; });
+    renderAll();
+    setSyncStatus("Deleted ✓", "ok");
+  } catch(e) {
+    setSyncStatus("Delete failed: " + e.message, "err");
+  }
+}
+
+// ─── AI ───────────────────────────────────────────────────────────────────────
+function setAiPrompt(text) {
+  document.getElementById("aiInput").value = text;
+  document.getElementById("aiInput").focus();
+}
+
+async function askAI() {
+  var input = document.getElementById("aiInput");
+  var q     = input.value.trim();
+  if (!q) return;
+
+  var key = getKey();
+  if (!key) { alert("No API key set. Go to Settings."); return; }
+
+  var el = document.getElementById("aiAnswer");
+  el.innerHTML = '<div class="loading-text">Thinking...</div>';
+  input.disabled = true;
+
+  // Build context from tracker data
+  var actionSummary = actions.map(function(a){
+    return "- ["+a.status+"] "+a.title+" ("+a.category+")";
+  }).join("\n");
+
+  var schSummary = scholarships.map(function(s){
+    return "- ["+s.status+"] "+s.name+" | "+s.country+" | Deadline: "+s.deadline;
+  }).join("\n");
+
+  var statusCounts = {};
+  actions.forEach(function(a){ statusCounts[a.status] = (statusCounts[a.status]||0)+1; });
+
+  var systemMsg =
+    "You are a scholarship advisor AI for a Filipino high school student applying to fully-funded programs.\n\n" +
+    "APPLICANT PROFILE:\n" +
+    "- National choral finalist (NAMCYA)\n" +
+    "- Self-taught AI developer (AWS cert, LangGraph, RAG, multi-agent systems)\n" +
+    "- Section Leader in school choir\n" +
+    "- GWA 92–94%\n" +
+    "- Father is ill (financial hardship)\n\n" +
+    "TARGET SCHOLARSHIPS: MEXT (Japan), GKS/KGSP (Korea), Stipendium Hungaricum (Hungary), CSC (China), Lester B. Pearson (Canada), GBF STEM, SM College Scholarship\n\n" +
+    "ACTION PLAN STATUS:\n" + (actionSummary || "No actions yet") + "\n\n" +
+    "SCHOLARSHIP PROGRAMS TRACKED:\n" + (schSummary || "No programs yet") + "\n\n" +
+    "Progress: " + (statusCounts["Done"]||0) + " done, " + (statusCounts["In Progress"]||0) + " in progress, " + (statusCounts["Not Started"]||0) + " not started\n\n" +
+    "Answer the user's question directly and concisely. Be specific and actionable. No fluff.";
+
+  try {
+    var res = await fetch(GROQ_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "Authorization":"Bearer "+key },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role:"system", content:systemMsg },
+          { role:"user",   content:q }
+        ],
+        temperature: 0.4
+      })
+    });
+    if (!res.ok) throw new Error("API error " + res.status);
+    var data = await res.json();
+    var ans = data.choices?.[0]?.message?.content || "No answer.";
+    el.innerHTML = '<div class="ai-answer">' + esc(ans) + '</div>';
+    input.value = "";
+  } catch(e) {
+    el.innerHTML = '<div class="feedback-item" style="color:var(--red)">Error: ' + esc(e.message) + '</div>';
+  } finally {
+    input.disabled = false;
+  }
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────────────────
+function showSettings() {
+  document.getElementById("settingsKey").value = getKey();
+  document.getElementById("settingsModal").classList.remove("hidden");
+}
+function closeSettings() {
+  document.getElementById("settingsModal").classList.add("hidden");
+}
+function saveSettings() {
+  var k = document.getElementById("settingsKey").value.trim();
+  if (k) localStorage.setItem("groq_key", k);
+  closeSettings();
+}
+function clearLocalCache() {
+  if (!confirm("Clear local cache? Your Google Sheet data stays safe.")) return;
+  actions = [];
+  scholarships = [];
+  renderAll();
+  closeSettings();
+}
+
+// ─── ACTIVE CHIP STYLE ────────────────────────────────────────────────────────
+var style = document.createElement("style");
+style.textContent = ".active-chip{background:var(--surface2);border-color:#444;color:var(--text)!important}";
+document.head.appendChild(style);
+
+// ─── START ────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
