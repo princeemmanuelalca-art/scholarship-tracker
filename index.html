@@ -328,6 +328,58 @@
     let allData = [];
     let activeCategory = "All";
 
+    // ── SMART TITLE DETECTION ───────────────────────────────
+    function getTitle(item) {
+      const possibleKeys = [
+        'Scholarship/Program',
+        'Scholarship',
+        'Scholarship Name',
+        'Program',
+        'Document',
+        'Action Item',
+        'Office / Organization',
+        '#',
+        'Country',
+        'Contact/Portal',
+        'Submission Method'
+      ];
+
+      for (const key of possibleKeys) {
+        if (item[key] && item[key] !== "null" && item[key] !== "") {
+          return item[key];
+        }
+      }
+
+      // Fallback: first non-empty value that isn't Category
+      for (const [key, value] of Object.entries(item)) {
+        if (key !== 'Category' && value && value !== "null" && value !== "") {
+          return value;
+        }
+      }
+
+      return 'Unnamed';
+    }
+
+    // ── SMART SUBTITLE DETECTION ────────────────────────────
+    function getSubtitle(item) {
+      const subtitleFields = [
+        'Provider', 'University', 'Country', 'Coverage',
+        'Amount/Grant', 'Amount/Stipend', 'Contact / Portal',
+        'Address / Platform', 'Deadline/Notes', 'Category',
+        'Duration', 'Monthly Stipend (PHP)', 'Tuition',
+        'Accommodation', 'Airfare', 'Health Insurance',
+        'Competition Level', 'Language Req. at Application',
+        'Key Requirements', 'Key Eligibility Fit',
+        'Deadline (2027 Intake)', 'Level', 'Key Notes'
+      ];
+
+      const parts = subtitleFields
+        .map(f => item[f])
+        .filter(v => v && v !== "null" && v !== "");
+
+      return parts.slice(0, 2).join(' · ');
+    }
+
     function formatLabel(key) {
       return key
         .replace(/_/g, ' ')
@@ -387,7 +439,7 @@
       });
 
       document.getElementById('resultsMeta').textContent =
-        allData.length > 0 ? `${filtered.length} of ${allData.length} scholarships` : '';
+        allData.length > 0 ? `${filtered.length} of ${allData.length} entries` : '';
 
       renderGrid(filtered);
     }
@@ -406,7 +458,7 @@
         grid.innerHTML = `
           <div class="empty-state" style="grid-column: 1/-1">
             <div class="icon">🔍</div>
-            <p>No scholarships match your search.</p>
+            <p>No entries match your search.</p>
           </div>`;
         return;
       }
@@ -416,9 +468,8 @@
         card.className = 'glass card';
         card.onclick = () => openModal(item);
 
-        const title = item['Scholarship/Program'] || item.Program || item.Scholarship || item['Scholarship Name'] || 'Unnamed';
-        const sub = [item.Provider, item.University, item.Country]
-          .filter(v => v && v !== "null" && v !== "").slice(0, 2).join(' · ');
+        const title = getTitle(item);
+        const sub = getSubtitle(item);
 
         card.innerHTML = `
           <div class="card-badge">${item.Category || 'Program'}</div>
@@ -431,7 +482,7 @@
     }
 
     function openModal(s) {
-      const title = s.Program || s.Scholarship || s['Scholarship Name'] || 'Scholarship';
+      const title = getTitle(s);
 
       let html = `
         <div class="modal-category">${s.Category || ''}</div>
@@ -439,7 +490,10 @@
         <hr class="divider">
       `;
 
-      const skip = new Set(['Category', 'Program', 'Scholarship', 'Scholarship Name']);
+      // Skip fields already shown in title or category
+      const skip = new Set(['Category']);
+      const titleKey = Object.keys(s).find(k => s[k] === title);
+      if (titleKey) skip.add(titleKey);
 
       for (const [key, value] of Object.entries(s)) {
         if (!value || value === "null" || value === "" || skip.has(key)) continue;
