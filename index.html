@@ -394,6 +394,7 @@
       display: none;
     }
   </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -452,7 +453,7 @@
   </div>
 
   <script>
-    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_pbIskgGs6a-tTuwgyMmViHttZMYgwpqxuN25fRG3Scede4enBWtzMXkdjjALOrTQYw/exec";
+    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1bfo3kI8X74Nvdv_aiRJVjTEXx9GbmyLeQuYOrkZ_l5LlBfTtcAiVsIg2TqPGRRsi5w/exec";
 
     let allData = [];
     let activeCategory = "All";
@@ -467,7 +468,7 @@
 
     // ── DETECT URLs and linkify ──
     function linkify(text) {
-      const urlPattern = /https?:\/\/[^\s]+/g;
+      const urlPattern = /https?:\/\/[^\s<>"{}|\^`\[\]]+/g;
       return String(text).replace(urlPattern, url => `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
     }
 
@@ -546,11 +547,11 @@
         return;
       }
 
-      source.forEach((item, index) => {
-        const realIndex = allData.indexOf(item);
+      source.forEach(item => {
         const card = document.createElement('div');
         card.className = 'glass card';
-        card.onclick = () => openModal(realIndex);
+        // Pass the item object directly instead of relying on indexOf
+        card.onclick = () => openModal(item);
 
         const title = item['Scholarship/Program'] || item.Program || item.Scholarship || item['Scholarship Name'] || 'Unnamed';
         const sub = [item.Provider, item.University, item.Country]
@@ -567,8 +568,7 @@
     }
 
     // ── MODAL ──
-    function openModal(index) {
-      const s = allData[index];
+    function openModal(s) {
       const title = s.Program || s.Scholarship || s['Scholarship Name'] || 'Scholarship';
 
       let html = `
@@ -595,10 +595,17 @@
     }
 
     function closeModal(e) {
-      if (e && e.target !== document.getElementById('modalOverlay') && !e.target.classList.contains('close-btn')) return;
-      if (e && e.currentTarget === document.getElementById('modalOverlay') && e.target !== e.currentTarget) return;
-      document.getElementById('modalOverlay').classList.remove('active');
-      document.body.style.overflow = '';
+      // Called without event (close button) → always close
+      if (!e) {
+        document.getElementById('modalOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+        return;
+      }
+      // Called with event (overlay click) → only close if clicking overlay background itself
+      if (e.target === document.getElementById('modalOverlay')) {
+        document.getElementById('modalOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+      }
     }
 
     // ── TAB SWITCH ──
@@ -629,6 +636,7 @@
       try {
         const res = await fetch(APPSCRIPT_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'askAI', question: text })
         });
         const data = await res.json();
