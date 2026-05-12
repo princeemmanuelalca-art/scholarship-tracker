@@ -552,7 +552,7 @@
         card.className = 'glass card';
         card.onclick = () => openModal(realIndex);
 
-        const title = item.Program || item.Scholarship || item['Scholarship Name'] || 'Scholarship';
+        const title = item['Scholarship/Program'] || item.Program || item.Scholarship || item['Scholarship Name'] || 'Unnamed';
         const sub = [item.Provider, item.University, item.Country]
           .filter(v => v && v !== "null" && v !== "").slice(0, 2).join(' · ');
 
